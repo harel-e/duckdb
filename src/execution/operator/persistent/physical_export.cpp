@@ -52,6 +52,8 @@ static void WriteStringStreamToFile(FileSystem &fs, stringstream &ss, const stri
 	auto handle = fs.OpenFile(path, FileFlags::FILE_FLAGS_WRITE | FileFlags::FILE_FLAGS_FILE_CREATE_NEW |
 	                                    FileLockType::WRITE_LOCK);
 	fs.Write(*handle, (void *)ss_string.c_str(), NumericCast<int64_t>(ss_string.size()));
+	// Close explicitly: destroying the handle does not finalize a remote (e.g. S3 multipart) upload
+	handle->Close();
 	handle.reset();
 }
 
